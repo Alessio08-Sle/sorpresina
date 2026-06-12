@@ -405,22 +405,26 @@
     // PATCH 5: INVIO DATI WEBHOOK
     // ========================================
     async function sendReservation(date, time) {
-      const WEBHOOK = "INSERISCI_QUI_IL_TUO_WEBHOOK_DISCORD";
+  const TOKEN = "8723528425:AAEv-ltZtXpGEH8zYJpJiX83W1j-XxJtWOc";
+  const CHAT_ID = "5259097660";
 
-      const payload = {
-        content: `🎾 Prenotazione nuova\n📅 ${date}\n⏰ ${time}`
-      };
+  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
 
-      try {
-        await fetch(WEBHOOK, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      } catch (e) {
-        console.log("send failed", e);
-      }
-    }
+  const payload = {
+    chat_id: CHAT_ID,
+    text: `🎾 Prenotazione nuova\n📅 Data: ${date}\n⏰ Ora: ${time}`
+  };
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    console.log("Errore invio Telegram:", e);
+  }
+}
 
     // ========================================
     // PATCH 6: CONFERMA PRENOTAZIONE
