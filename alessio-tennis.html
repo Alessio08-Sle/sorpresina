@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Una sorpresa per te 🎾</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Cuori bianchi animati sullo sfondo */
+    .heart {
+      position: absolute;
+      color: white;
+      font-size: 20px;
+      opacity: 0.6;
+      animation: float 15s infinite linear;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      width: 90%;
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #34495e;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .gif-container {
+      width: 150px;
+      height: 150px;
+      margin: 20px auto;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .gif-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #ecf0f1;
+      color: #2c3e50;
+    }
+
+    .btn-secondary:hover {
+      background: #d5dbdb;
+    }
+
+    .btn-runaway {
+      position: absolute;
+      transition: all 0.3s ease;
+      background: #e74c3c;
+      color: white;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    .emoji {
+      font-size: 48px;
+      margin: 15px 0;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .success {
+      color: #27ae60;
+      font-size: 18px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Cuori animati sullo sfondo -->
+  <div id="hearts-container"></div>
+
+  <div class="container">
+    <!-- SCHERMATA 1: Quiz iniziale -->
+    <div id="screen1" class="screen active">
+      <h1>Una sorpresa per te 🎾</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Tennis">
+      </div>
+      <h2>Sei la migliore amica di Alessio?</h2>
+      <p>Prima di procedere, dobbiamo accertarcelo.</p>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="answer1(true)">Sì ✨</button>
+        <button class="btn-secondary" onclick="answer1(false)">No 😾</button>
+      </div>
+      <p class="error" id="error1"></p>
+    </div>
+
+    <!-- SCHERMATA 2: Vuoi bene? -->
+    <div id="screen2" class="screen">
+      <h1>Vuoi bene al tuo migliore amico?</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/l0MYGb1LuUL3q7Ut2/giphy.gif" alt="Amicizia">
+      </div>
+      <p>Pensa bene prima di rispondere.</p>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="answer2(true)">Sì, tantissimo ❤️</button>
+        <button class="btn-secondary" onclick="answer2(false)">No 😈😾</button>
+      </div>
+      <p class="error" id="error2"></p>
+    </div>
+
+    <!-- SCHERMATA 3: Quanto vuoi bene -->
+    <div id="screen3" class="screen">
+      <h1>Quanto vuoi bene ad Alessio?</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/26BRBKqUiq586bF9C/giphy.gif" alt="Cuori">
+      </div>
+      <p>Scegli con cura. Il futuro dipende da questa risposta.</p>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="answer3('infinito')">♾️ Infinito</button>
+        <button class="btn-secondary" onclick="answer3('tanto')">❤️ Tanto</button>
+        <button class="btn-secondary" onclick="answer3('poco')">😒 Poco</button>
+        <button class="btn-secondary" onclick="answer3('nulla')">💀 Nulla</button>
+      </div>
+      <p class="error" id="error3"></p>
+    </div>
+
+    <!-- SCHERMATA 4: Successo -->
+    <div id="screen4" class="screen">
+      <h1>🥳 Risposta corretta!</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" alt="Festa">
+      </div>
+      <p class="success">Finalmente! Sapevo che lo sapevi ♾️</p>
+      <p>L'amore infinito merita una ricompensa.</p>
+      <button class="btn-primary" onclick="showScreen('screen5')">Avanti → 🎾🎾</button>
+    </div>
+
+    <!-- SCHERMATA 5: Prenotazione -->
+    <div id="screen5" class="screen">
+      <h1>Vuoi prenotare una lezione di tennis con il maestro migliore?</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/26BRBKqUiq586bF9C/giphy.gif" alt="Tennis">
+      </div>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="showScreen('screen6')">Sì, assolutamente! 🎾</button>
+        <button class="btn-runaway" id="runawayBtn" onclick="moveRunaway(this)">No 🤨</button>
+      </div>
+    </div>
+
+    <!-- SCHERMATA 6: Data e ora -->
+    <div id="screen6" class="screen">
+      <h1>Quando vuoi venire in campo?</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/l0MYGb1LuUL3q7Ut2/giphy.gif" alt="Calendar">
+      </div>
+      <p>Scegli la data e l'ora della tua lezione. Niente scuse.</p>
+      <input type="date" id="bookingDate" min="">
+      <input type="time" id="bookingTime">
+      <button class="btn-primary" onclick="confirmBooking()" style="margin-top: 20px;">Conferma prenotazione 🎾</button>
+      <p class="error" id="error6"></p>
+    </div>
+
+    <!-- SCHERMATA 7: Conferma -->
+    <div id="screen7" class="screen">
+      <h1>🥳 Prenotazione confermata! 🎉</h1>
+      <div class="gif-container">
+        <img src="https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" alt="Success">
+      </div>
+      <p class="success">Ti aspetto in campo ❤️</p>
+      <p><strong>📅 Data:</strong> <span id="finalDate"></span></p>
+      <p><strong>⏰ Ora:</strong> <span id="finalTime"></span></p>
+      <p style="margin-top: 20px; font-size: 14px;">Porta le scarpe giuste, l'entusiasmo sbagliato è già incluso nel prezzo. 😄</p>
+    </div>
+  </div>
+
+  <script>
+    // ========================================
+    // PATCH 1: STATE SERIO
+    // ========================================
+    const STATE = {
+      screen: 'screen1',
+      booking: {
+        date: null,
+        time: null
+      },
+      flags: {
+        runawayCooldown: false
+      }
+    };
+
+    // ========================================
+    // PATCH 2: NAVIGAZIONE STABILE
+    // ========================================
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active', 'entering', 'leaving');
+        s.style.display = 'none';
+      });
+
+      const el = document.getElementById(id);
+      el.style.display = 'flex';
+      el.classList.add('active');
+
+      STATE.screen = id;
+    }
+
+    // ========================================
+    // CUORI ANIMATI SULLO SFONDO
+    // ========================================
+    function createHearts() {
+      const container = document.getElementById('hearts-container');
+      const heartCount = 30;
+
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDelay = Math.random() * 15 + 's';
+        heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+        container.appendChild(heart);
+      }
+    }
+
+    // ========================================
+    // LOGICA QUIZ
+    // ========================================
+    function answer1(correct) {
+      if (correct) {
+        showScreen('screen2');
+      } else {
+        const error = document.getElementById('error1');
+        error.textContent = 'Scelta sbagliata 😾 Che delusione. Stavo quasi piangendo.';
+        error.style.display = 'block';
+        setTimeout(() => error.style.display = 'none', 3000);
+      }
+    }
+
+    function answer2(correct) {
+      if (correct) {
+        showScreen('screen3');
+      } else {
+        const error = document.getElementById('error2');
+        error.textContent = 'Errore critico 😾 Come hai fatto?! Questo non doveva succedere.';
+        error.style.display = 'block';
+        setTimeout(() => error.style.display = 'none', 3000);
+      }
+    }
+
+    function answer3(level) {
+      if (level === 'infinito') {
+        showScreen('screen4');
+      } else {
+        const error = document.getElementById('error3');
+        error.textContent = 'Quasi… Ma non è la risposta giusta.';
+        error.style.display = 'block';
+        setTimeout(() => error.style.display = 'none', 3000);
+      }
+    }
+
+    // ========================================
+    // PATCH 3: RUNAWAY BUTTON CON COOLDOWN
+    // ========================================
+    let lastMove = 0;
+
+    function moveRunaway(btn) {
+      const now = Date.now();
+      if (now - lastMove < 180) return; // cooldown serio
+      lastMove = now;
+
+      const margin = 20;
+      const w = btn.offsetWidth;
+      const h = btn.offsetHeight;
+
+      const x = Math.random() * (window.innerWidth - w - margin);
+      const y = Math.random() * (window.innerHeight - h - margin);
+
+      btn.style.left = `${Math.max(margin, x)}px`;
+      btn.style.top = `${Math.max(margin, y)}px`;
+    }
+
+    // ========================================
+    // PATCH 4: VALIDAZIONE DATA SERIA
+    // ========================================
+    function isValidBooking(date, time) {
+      if (!date || !time) return false;
+
+      const selected = new Date(`${date}T${time}`);
+      const now = new Date();
+
+      return selected.getTime() > now.getTime();
+    }
+
+    // ========================================
+    // PATCH 5: INVIO DATI WEBHOOK
+    // ========================================
+    async function sendReservation(date, time) {
+      const WEBHOOK = "INSERISCI_QUI_IL_TUO_WEBHOOK_DISCORD";
+
+      const payload = {
+        content: `🎾 Prenotazione nuova\n📅 ${date}\n⏰ ${time}`
+      };
+
+      try {
+        await fetch(WEBHOOK, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.log("send failed", e);
+      }
+    }
+
+    // ========================================
+    // PATCH 6: CONFERMA PRENOTAZIONE
+    // ========================================
+    async function confirmBooking() {
+      const d = document.getElementById('bookingDate');
+      const t = document.getElementById('bookingTime');
+      const error = document.getElementById('error6');
+
+      if (!isValidBooking(d.value, t.value)) {
+        error.textContent = '⚠️ Seleziona una data e ora valida (deve essere nel futuro)';
+        error.style.display = 'block';
+        setTimeout(() => error.style.display = 'none', 3000);
+        return;
+      }
+
+      // PATCH 6: Aggiorna STATE
+      STATE.booking.date = d.value;
+      STATE.booking.time = t.value;
+
+      // Invia dati
+      await sendReservation(d.value, t.value);
+
+      // Mostra conferma
+      document.getElementById('finalDate').textContent = d.value;
+      document.getElementById('finalTime').textContent = t.value;
+      showScreen('screen7');
+    }
+
+    // ========================================
+    // INIZIALIZZAZIONE
+    // ========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      createHearts();
+      
+      // Imposta data minima a oggi
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('bookingDate').setAttribute('min', today);
+    });
+  </script>
+</body>
+</html>
