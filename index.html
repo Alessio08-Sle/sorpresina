@@ -1,469 +1,944 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Una sorpresa per te 🎾</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Una sorpresa per te 🎾</title>
+<style>
+  :root {
+    /* =========================================================
+       🎨 COLORI PRINCIPALI — modifica questi per cambiare tema
+       =========================================================
+       Tema attuale: BLU
+       Per tornare al rosa originale sostituisci con:
+         --primary:       #ff6b9d
+         --primary-light: #ffb3d0
+         --primary-pale:  #fff0f6
+         --primary-dark:  #ff4081
+         --bg:            #f0c8d8
+         --shadow:        0 8px 32px rgba(180,80,120,0.22)
+         --shadow-hover:  0 12px 40px rgba(180,80,120,0.38)
+         --text:          #3d2b3d
+         --text-light:    #8a6b8a
+    ========================================================= */
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      position: relative;
-    }
+    /* 🔵 Colore principale — bottoni, bordi, accenti */
+    --primary:       #4a90d9;
+    /* 🔵 Versione chiara — bordi sottili, hover leggero */
+    --primary-light: #a8cdf0;
+    /* 🔵 Versione pallida — sfondi interni card, badge */
+    --primary-pale:  #eaf3fc;
+    /* 🔵 Versione scura — gradiente bottoni, pressione */
+    --primary-dark:  #1a6bbf;
 
-    /* Cuori bianchi animati sullo sfondo */
-    .heart {
-      position: absolute;
-      color: white;
-      font-size: 20px;
-      opacity: 0.6;
-      animation: float 15s infinite linear;
-      pointer-events: none;
-    }
+    /* 🌅 SFONDO PAGINA — cambia solo questo per cambiare lo sfondo */
+    --bg: #1e3a5f;
 
-    @keyframes float {
-      0% {
-        transform: translateY(100vh) translateX(0) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 0.6;
-      }
-      90% {
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(-100vh) translateX(100px) rotate(360deg);
-        opacity: 0;
-      }
-    }
+    /* 🔴 Errori e messaggi drama */
+    --coral: #ff6b6b;
+    /* 🟢 Conferme e bottone successo */
+    --green: #4caf82;
 
-    .container {
-      width: 90%;
-      max-width: 500px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      position: relative;
-      z-index: 1;
-    }
+    /* ✍️ Testi — visibili dentro le card bianche */
+    --text:       #1a2a3d;
+    --text-light: #5a7a9a;
 
-    .screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      animation: fadeIn 0.5s ease;
-    }
+    /* 🌑 Ombre card */
+    --shadow:       0 8px 32px rgba(30,60,100,0.28);
+    --shadow-hover: 0 12px 40px rgba(30,60,100,0.42);
 
-    .screen.active {
-      display: flex;
-    }
+    /* alias per compatibilità col resto del codice */
+    --pink:       var(--primary);
+    --pink-light: var(--primary-light);
+    --pink-pale:  var(--primary-pale);
+    --rose:       var(--primary-dark);
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    h1 {
-      font-size: 28px;
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    color: var(--text);
+    touch-action: manipulation;
+    user-select: none;
+  }
 
-    h2 {
-      font-size: 22px;
-      color: #34495e;
-      margin-bottom: 15px;
-    }
+  /* ── HEARTS BACKGROUND ── */
+  #hearts-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .heart-particle {
+    position: absolute; bottom: -50px;
+    animation: floatHeart linear infinite;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .heart-particle svg { display: block; }
+  @keyframes floatHeart {
+    0%   { transform: translateY(0) rotate(-12deg) scale(0.7); opacity: 0; }
+    10%  { opacity: 0.92; }
+    85%  { opacity: 0.75; }
+    100% { transform: translateY(-115vh) rotate(18deg) scale(1.15); opacity: 0; }
+  }
 
-    p {
-      font-size: 16px;
-      color: #555;
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
+  /* ── FRASI DI SFONDO (appaiono dalla schermata 2 in poi) ── */
+  #compliments-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  #compliments-bg.visible { opacity: 1; }
+  .compliment-word {
+    position: absolute;
+    /* 🎨 Colore frasi di sfondo — rgba(R,G,B, opacità) */
+    color: rgba(255, 255, 255, 0.22);
+    font-weight: 800;
+    white-space: nowrap;
+    animation: floatWord linear infinite;
+    will-change: transform, opacity;
+    letter-spacing: 0.02em;
+  }
+  @keyframes floatWord {
+    0%   { transform: translateY(0) rotate(var(--rot)) scale(0.85); opacity: 0; }
+    8%   { opacity: 1; }
+    88%  { opacity: 0.8; }
+    100% { transform: translateY(-120vh) rotate(calc(var(--rot) + 8deg)) scale(1.05); opacity: 0; }
+  }
 
-    .gif-container {
-      width: 150px;
-      height: 150px;
-      margin: 20px auto;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
+  /* ── STAGE ── */
+  #stage {
+    position: relative; z-index: 1;
+    min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
 
-    .gif-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    max-width: 480px; width: 100%;
+    animation-duration: 0.42s;
+    animation-fill-mode: both;
+    gap: 20px;
+  }
+  .screen.active  { display: flex; }
+  .screen.entering { animation-name: screenIn; }
+  .screen.leaving  { animation-name: screenOut; position: absolute; pointer-events: none; }
 
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      margin-top: 20px;
-    }
+  @keyframes screenIn  { from { opacity:0; transform: translateY(28px) scale(0.96); } to { opacity:1; transform: translateY(0) scale(1); } }
+  @keyframes screenOut { from { opacity:1; transform: translateY(0) scale(1); } to { opacity:0; transform: translateY(-28px) scale(0.96); } }
 
-    button {
-      padding: 15px 30px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-    }
+  /* ── CARD ── */
+  .card {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 28px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+  }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
+  /* ── TYPOGRAPHY ── */
+  h1 { font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 800; line-height: 1.25; }
+  h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; line-height: 1.3; }
+  .subtitle { font-size: 0.97rem; color: var(--text-light); line-height: 1.55; }
+  .drama-text { font-size: 1rem; font-weight: 600; color: var(--coral); min-height: 1.4em; }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-    }
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
+  .btn {
+    padding: 14px 28px; border: none; border-radius: 50px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    outline: none; flex: 1; min-width: 120px;
+    -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+  }
+  .btn:not(:disabled):hover  { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+  .btn:not(:disabled):active { transform: scale(0.96); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    .btn-secondary {
-      background: #ecf0f1;
-      color: #2c3e50;
-    }
+  .btn-primary   { background: linear-gradient(135deg, var(--pink), var(--rose)); color: white; box-shadow: 0 4px 18px rgba(255,64,129,0.35); }
+  .btn-secondary { background: white; color: var(--pink); border: 2px solid var(--pink-light); }
+  .btn-success   { background: linear-gradient(135deg, #4caf82, #2e7d57); color: white; box-shadow: 0 4px 18px rgba(76,175,130,0.35); }
 
-    .btn-secondary:hover {
-      background: #d5dbdb;
-    }
+  /* ── GIF BOX ── */
+  .gif-box {
+    width: 180px; height: 180px;
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+    background: var(--pink-pale);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gif-box img {
+    width: 100%; height: 100%;
+    object-fit: cover; border-radius: 20px;
+    display: block;
+  }
 
-    .btn-runaway {
-      position: absolute;
-      transition: all 0.3s ease;
-      background: #e74c3c;
-      color: white;
-    }
+  /* ── OPTIONS GRID ── */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+  .option-btn {
+    padding: 18px 10px; border: 2.5px solid var(--pink-light);
+    border-radius: 18px; background: white; color: var(--text);
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: all 0.18s; display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .option-btn:hover  { border-color: var(--pink); background: var(--pink-pale); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .option-btn:active { transform: scale(0.95); }
+  .option-btn .emoji { font-size: 1.8rem; }
 
-    input[type="date"],
-    input[type="time"] {
-      padding: 12px;
-      font-size: 16px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      margin: 10px 0;
-      width: 100%;
-    }
+  /* ── DATE/TIME ── */
+  .field-group { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
+  .field-label { font-size: 0.82rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.07em; }
+  input[type="date"], input[type="time"] {
+    width: 100%; padding: 14px 16px; border: 2px solid var(--pink-light);
+    border-radius: 14px; font-size: 1.05rem; font-weight: 600; color: var(--text);
+    background: white; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none; appearance: none;
+  }
+  input:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(255,107,157,0.15); }
+  input.error { border-color: var(--coral); box-shadow: 0 0 0 4px rgba(255,107,107,0.15); animation: shake 0.4s; }
 
-    .emoji {
-      font-size: 48px;
-      margin: 15px 0;
-    }
+  /* ── BOOKING SUMMARY ── */
+  .booking-details {
+    background: var(--pink-pale); border-radius: 18px; padding: 18px 22px;
+    width: 100%; display: flex; flex-direction: column; gap: 10px;
+    border: 2px solid var(--pink-light);
+  }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; }
+  .detail-label { color: var(--text-light); font-weight: 600; font-size: 0.95rem; }
+  .detail-value { font-weight: 800; color: var(--pink); font-size: 1.1rem; }
 
-    .error {
-      color: #e74c3c;
-      font-size: 14px;
-      margin-top: 10px;
-      display: none;
-    }
+  /* ── PROGRESS DOTS ── */
+  .progress { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.3s; }
+  .dot.active { background: white; transform: scale(1.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.4); }
+  .dot.done   { background: var(--green); }
 
-    .success {
-      color: #27ae60;
-      font-size: 18px;
-      margin-top: 15px;
-    }
-  </style>
+  /* ── BADGE ── */
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; font-size: 0.88rem; font-weight: 700; }
+  .badge-success { background: #e8f5e9; color: var(--green); }
+
+  /* ── CONFETTI ── */
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes pulse  { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+  .shake  { animation: shake 0.45s ease-in-out; }
+  .bounce { animation: bounce 0.8s ease-in-out infinite; }
+  .pulse  { animation: pulse 1.2s ease-in-out infinite; }
+
+  /* ── RUNAWAY NO BUTTON ── */
+  #no-btn-s2 {
+    display: none;
+    position: fixed; z-index: 20;
+    padding: 14px 28px; border-radius: 50px;
+    background: white; color: var(--pink);
+    border: 2px solid var(--pink-light);
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; touch-action: none;
+    transition: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 360px) {
+    .card { padding: 22px 14px; }
+    .options-grid { gap: 8px; }
+    .option-btn { padding: 14px 6px; }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    #stage { align-items: flex-start; padding: 10px; }
+    .card { padding: 18px; gap: 12px; }
+    .gif-box { width: 100px; height: 100px; }
+  }
+</style>
 </head>
 <body>
-  <!-- Cuori animati sullo sfondo -->
-  <div id="hearts-container"></div>
 
-  <div class="container">
-    <!-- SCHERMATA 1: Quiz iniziale -->
-    <div id="screen1" class="screen active">
-      <h1>Una sorpresa per te 🎾</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" alt="Tennis">
-      </div>
-      <h2>Sei la migliore amica di Alessio?</h2>
-      <p>Prima di procedere, dobbiamo accertarcelo.</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answer1(true)">Sì ✨</button>
-        <button class="btn-secondary" onclick="answer1(false)">No 😾</button>
-      </div>
-      <p class="error" id="error1"></p>
+<div id="hearts-bg"></div>
+<!-- Layer frasi di sfondo: appare dopo la schermata 1 -->
+<div id="compliments-bg"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<div id="stage">
+
+  <!-- ════════════════ SCREEN 1 – INTRO ════════════════ -->
+  <div class="screen active" id="screen-1">
+    <div class="progress">
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-
-    <!-- SCHERMATA 2: Vuoi bene? -->
-    <div id="screen2" class="screen">
-      <h1>Vuoi bene al tuo migliore amico?</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/l0MYGb1LuUL3q7Ut2/giphy.gif" alt="Amicizia">
+    <div class="card" id="card-1">
+      <div style="font-size:3rem">🤔</div>
+      <h1>Sei la migliore amica di Alessio?</h1>
+      <p class="subtitle">Prima di procedere, dobbiamo accertarcelo.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="APP.s1_yes()">Sì ✨</button>
+        <button class="btn btn-secondary" onclick="APP.s1_no()">No</button>
       </div>
-      <p>Pensa bene prima di rispondere.</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answer2(true)">Sì, tantissimo ❤️</button>
-        <button class="btn-secondary" onclick="answer2(false)">No 😈😾</button>
-      </div>
-      <p class="error" id="error2"></p>
-    </div>
-
-    <!-- SCHERMATA 3: Quanto vuoi bene -->
-    <div id="screen3" class="screen">
-      <h1>Quanto vuoi bene ad Alessio?</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/26BRBKqUiq586bF9C/giphy.gif" alt="Cuori">
-      </div>
-      <p>Scegli con cura. Il futuro dipende da questa risposta.</p>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="answer3('infinito')">♾️ Infinito</button>
-        <button class="btn-secondary" onclick="answer3('tanto')">❤️ Tanto</button>
-        <button class="btn-secondary" onclick="answer3('poco')">😒 Poco</button>
-        <button class="btn-secondary" onclick="answer3('nulla')">💀 Nulla</button>
-      </div>
-      <p class="error" id="error3"></p>
-    </div>
-
-    <!-- SCHERMATA 4: Successo -->
-    <div id="screen4" class="screen">
-      <h1>🥳 Risposta corretta!</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" alt="Festa">
-      </div>
-      <p class="success">Finalmente! Sapevo che lo sapevi ♾️</p>
-      <p>L'amore infinito merita una ricompensa.</p>
-      <button class="btn-primary" onclick="showScreen('screen5')">Avanti → 🎾🎾</button>
-    </div>
-
-    <!-- SCHERMATA 5: Prenotazione -->
-    <div id="screen5" class="screen">
-      <h1>Vuoi prenotare una lezione di tennis con il maestro migliore?</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/26BRBKqUiq586bF9C/giphy.gif" alt="Tennis">
-      </div>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="showScreen('screen6')">Sì, assolutamente! 🎾</button>
-        <button class="btn-runaway" id="runawayBtn" onclick="moveRunaway(this)">No 🤨</button>
-      </div>
-    </div>
-
-    <!-- SCHERMATA 6: Data e ora -->
-    <div id="screen6" class="screen">
-      <h1>Quando vuoi venire in campo?</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/l0MYGb1LuUL3q7Ut2/giphy.gif" alt="Calendar">
-      </div>
-      <p>Scegli la data e l'ora della tua lezione. Niente scuse.</p>
-      <input type="date" id="bookingDate" min="">
-      <input type="time" id="bookingTime">
-      <button class="btn-primary" onclick="confirmBooking()" style="margin-top: 20px;">Conferma prenotazione 🎾</button>
-      <p class="error" id="error6"></p>
-    </div>
-
-    <!-- SCHERMATA 7: Conferma -->
-    <div id="screen7" class="screen">
-      <h1>🥳 Prenotazione confermata! 🎉</h1>
-      <div class="gif-container">
-        <img src="https://media.giphy.com/media/g9582DNuQppxC/giphy.gif" alt="Success">
-      </div>
-      <p class="success">Ti aspetto in campo ❤️</p>
-      <p><strong>📅 Data:</strong> <span id="finalDate"></span></p>
-      <p><strong>⏰ Ora:</strong> <span id="finalTime"></span></p>
-      <p style="margin-top: 20px; font-size: 14px;">Porta le scarpe giuste, l'entusiasmo sbagliato è già incluso nel prezzo. 😄</p>
+      <div class="drama-text" id="drama-1"></div>
     </div>
   </div>
 
-  <script>
-    // ========================================
-    // PATCH 1: STATE SERIO
-    // ========================================
-    const STATE = {
-      screen: 'screen1',
-      booking: {
-        date: null,
-        time: null
-      },
-      flags: {
-        runawayCooldown: false
-      }
-    };
+  <!-- ════════════════ SCREEN 1 – NO ════════════════ -->
+  <div class="screen" id="screen-1no">
+    <div class="card">
+      <!--
+        🎭 GIF: gatto arrabbiato
+        → Vai su giphy.com, cerca "angry cat"
+        → Clicca sulla GIF → Share → Copy GIF Link
+        → Incolla l'URL nell'src qui sotto
+      -->
+      <div class="gif-box">
+        <img src="https://media.giphy.com/media/v6aOjy0Qo1fIA/giphy.gif" alt="gatto arrabbiato">
+      </div>
+      <h2>Scelta sbagliata 😾</h2>
+      <p class="subtitle">Che delusione. Stavo quasi piangendo.</p>
+      <button class="btn btn-primary" onclick="APP.goto(1)">Riprova 🔄</button>
+    </div>
+  </div>
 
-    // ========================================
-    // PATCH 2: NAVIGAZIONE STABILE
-    // ========================================
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => {
-        s.classList.remove('active', 'entering', 'leaving');
-        s.style.display = 'none';
-      });
+  <!-- ════════════════ SCREEN 2 – TRAPPA DEL NO ════════════════ -->
+  <div class="screen" id="screen-2">
+    <div class="progress">
+      <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:2.5rem">💝</div>
+      <h1>Vuoi bene al tuo migliore amico?</h1>
+      <p class="subtitle">Pensa bene prima di rispondere.</p>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn btn-primary" style="flex:0 0 auto;min-width:160px" onclick="APP.s2_yes()">Sì, tantissimo ❤️</button>
+      </div>
+      <div class="drama-text" id="drama-2"></div>
+    </div>
+  </div>
 
-      const el = document.getElementById(id);
-      el.style.display = 'flex';
-      el.classList.add('active');
+  <!-- ════════════════ SCREEN 2 – NO (bug) ════════════════ -->
+  <div class="screen" id="screen-2no">
+    <div class="card">
+      <!--
+        🎭 GIF: gatto arrabbiato / sorpreso
+        → Cerca "shocked cat" oppure "angry cat meme" su giphy.com
+      -->
+      <div class="gif-box">
+        <img src="https://media.giphy.com/media/v6aOjy0Qo1fIA/giphy.gif" alt="gatto shock">
+      </div>
+      <h2>Errore critico 😾</h2>
+      <p class="subtitle">Come hai fatto?! Questo non doveva succedere.</p>
+      <button class="btn btn-primary" onclick="APP.goto(2)">Riprova 🔄</button>
+    </div>
+  </div>
 
-      STATE.screen = id;
-    }
+  <!-- ════════════════ SCREEN 3 – QUANTO VUOI BENE ════════════════ -->
+  <div class="screen" id="screen-3">
+    <div class="progress">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:2.5rem">💭</div>
+      <h1>Quanto vuoi bene ad Alessio?</h1>
+      <p class="subtitle">Scegli con cura. Il futuro dipende da questa risposta.</p>
+      <div class="options-grid">
+        <button class="option-btn" onclick="APP.s3_answer('infinito')">
+          <span class="emoji">♾️</span><span>Infinito</span>
+        </button>
+        <button class="option-btn" onclick="APP.s3_answer('tanto')">
+          <span class="emoji">❤️</span><span>Tanto</span>
+        </button>
+        <button class="option-btn" onclick="APP.s3_answer('poco')">
+          <span class="emoji">😒</span><span>Poco</span>
+        </button>
+        <button class="option-btn" onclick="APP.s3_answer('nulla')">
+          <span class="emoji">💀</span><span>Nulla</span>
+        </button>
+      </div>
+      <div class="drama-text" id="drama-3"></div>
+    </div>
+  </div>
 
-    // ========================================
-    // CUORI ANIMATI SULLO SFONDO
-    // ========================================
-    function createHearts() {
-      const container = document.getElementById('hearts-container');
-      const heartCount = 30;
+  <!-- ════════════════ SCREEN 3 – RISPOSTA SBAGLIATA ════════════════ -->
+  <div class="screen" id="screen-3wrong">
+    <div class="card">
+      <!--
+        🎭 GIF: cambia in base alla risposta (gestita via JS sotto)
+        I src vengono sostituiti dinamicamente — modifica gli URL in wrongConfig nel JS
+      -->
+      <div class="gif-box" id="wrong-gif-box">
+        <img id="wrong-gif-img" src="" alt="reazione">
+      </div>
+      <h2 id="wrong-title">Quasi…</h2>
+      <p class="subtitle" id="wrong-sub">Ma non è la risposta giusta.</p>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="APP.goto(3)">← Indietro</button>
+        <button class="btn btn-primary"   onclick="APP.goto(3)">Riprova 🔄</button>
+      </div>
+    </div>
+  </div>
 
-      for (let i = 0; i < heartCount; i++) {
-        const heart = document.createElement('div');
-        heart.className = 'heart';
-        heart.innerHTML = '❤️';
-        heart.style.left = Math.random() * 100 + '%';
-        heart.style.animationDelay = Math.random() * 15 + 's';
-        heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
-        container.appendChild(heart);
-      }
-    }
+  <!-- ════════════════ SCREEN 3 – CORRETTA ════════════════ -->
+  <div class="screen" id="screen-3ok">
+    <div class="card">
+      <!--
+        🎭 GIF: esultanza / festa
+        → Cerca "party celebration", "yes excited", "dance happy" su giphy.com
+      -->
+      <div class="gif-box bounce">
+        <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="esultanza">
+      </div>
+      <div class="badge badge-success">✅ Risposta corretta!</div>
+      <h2>Finalmente! Lo sapevo che lo sapevi ♾️</h2>
+      <p class="subtitle">L'amore infinito merita una ricompensa.</p>
+      <button class="btn btn-success" onclick="APP.goto(4)">Avanti → 🎾</button>
+    </div>
+  </div>
 
-    // ========================================
-    // LOGICA QUIZ
-    // ========================================
-    function answer1(correct) {
-      if (correct) {
-        showScreen('screen2');
-      } else {
-        const error = document.getElementById('error1');
-        error.textContent = 'Scelta sbagliata 😾 Che delusione. Stavo quasi piangendo.';
-        error.style.display = 'block';
-        setTimeout(() => error.style.display = 'none', 3000);
-      }
-    }
+  <!-- ════════════════ SCREEN 4 – TENNIS ════════════════ -->
+  <div class="screen" id="screen-4">
+    <div class="progress">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:3.5rem">🎾</div>
+      <h1>Vuoi prenotare una lezione di tennis con il maestro migliore?</h1>
+      <p class="subtitle">Non rifiutare. Fidati.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary"   onclick="APP.s4_yes()">Sì, assolutamente! 🎾</button>
+        <button class="btn btn-secondary" onclick="APP.s4_no()">No</button>
+      </div>
+      <div class="drama-text" id="drama-4"></div>
+    </div>
+  </div>
 
-    function answer2(correct) {
-      if (correct) {
-        showScreen('screen3');
-      } else {
-        const error = document.getElementById('error2');
-        error.textContent = 'Errore critico 😾 Come hai fatto?! Questo non doveva succedere.';
-        error.style.display = 'block';
-        setTimeout(() => error.style.display = 'none', 3000);
-      }
-    }
+  <!-- ════════════════ SCREEN 4 – NO ════════════════ -->
+  <div class="screen" id="screen-4no">
+    <div class="card">
+      <!--
+        🎭 GIF: sguardo deluso / incredulo
+        → Cerca "really seriously", "disappointed stare", "are you kidding me" su giphy.com
+      -->
+      <div class="gif-box">
+        <img src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="sguardo incredulo">
+      </div>
+      <h2>Decisione discutibile 🤨</h2>
+      <p class="subtitle">Hai appena rifiutato la migliore offerta della tua vita.</p>
+      <button class="btn btn-primary" onclick="APP.goto(4)">Ripensaci 🤔</button>
+    </div>
+  </div>
 
-    function answer3(level) {
-      if (level === 'infinito') {
-        showScreen('screen4');
-      } else {
-        const error = document.getElementById('error3');
-        error.textContent = 'Quasi… Ma non è la risposta giusta.';
-        error.style.display = 'block';
-        setTimeout(() => error.style.display = 'none', 3000);
-      }
-    }
+  <!-- ════════════════ SCREEN 5 – DATA E ORA ════════════════ -->
+  <div class="screen" id="screen-5">
+    <div class="progress">
+      <div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot done"></div><div class="dot active"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:2.5rem">📅</div>
+      <h2>Quando vuoi venire in campo?</h2>
+      <p class="subtitle">Scegli data e ora. Niente scuse.</p>
+      <div class="field-group">
+        <label class="field-label" for="date-pick">📆 Data</label>
+        <input type="date" id="date-pick" onchange="APP.clearDateError()">
+      </div>
+      <div class="field-group">
+        <label class="field-label">⏰ Orario</label>
+        <div style="display:flex;align-items:center;gap:10px;width:100%">
+          <input type="time" id="time-from" onchange="APP.clearDateError()" style="flex:1">
+          <span style="font-weight:700;color:var(--text-light);flex-shrink:0">→</span>
+          <input type="time" id="time-to"   onchange="APP.clearDateError()" style="flex:1">
+        </div>
+      </div>
+      <div class="drama-text" id="drama-5"></div>
+      <button class="btn btn-success" onclick="APP.confirmBooking()" style="width:100%">
+        Conferma prenotazione 🎾
+      </button>
+    </div>
+  </div>
 
-    // ========================================
-    // PATCH 3: RUNAWAY BUTTON CON COOLDOWN
-    // ========================================
-    let lastMove = 0;
+  <!-- ════════════════ SCREEN FINALE ════════════════ -->
+  <div class="screen" id="screen-final">
+    <div class="card" style="gap:16px">
+      <!--
+        🎭 GIF: ballo / festa / coriandoli
+        → Cerca "confetti celebration", "dancing happy", "party time" su giphy.com
+      -->
+      <div class="gif-box pulse" style="width:140px;height:140px">
+        <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="festa">
+      </div>
+      <div style="font-size:2.2rem;letter-spacing:6px;line-height:1">🎾🎾🎾</div>
+      <h1 style="color:var(--pink)">Prenotazione confermata! 🎉</h1>
+      <p style="font-size:1.1rem;font-weight:700;color:var(--text)">Ti aspetto in campo ❤️</p>
+      <div class="booking-details">
+        <div class="detail-row">
+          <span class="detail-label">📆 Data</span>
+          <span class="detail-value" id="final-date">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">⏰ Orario</span>
+          <span class="detail-value" id="final-time">—</span>
+        </div>
+      </div>
+      <p class="subtitle">Porta le scarpe giuste. L'entusiasmo sbagliato è già incluso 😄</p>
+      <div style="font-size:1.8rem;letter-spacing:8px">🎾 🎾 🎾</div>
+      <div id="send-status" style="font-size:0.85rem;color:var(--green);font-weight:600;min-height:1.2em"></div>
+    </div>
+  </div>
 
-    function moveRunaway(btn) {
-      const now = Date.now();
-      if (now - lastMove < 180) return; // cooldown serio
-      lastMove = now;
+</div><!-- /stage -->
 
-      const margin = 20;
-      const w = btn.offsetWidth;
-      const h = btn.offsetHeight;
+<!-- RUNAWAY NO BUTTON – fuori da tutto, posizionato via JS -->
+<button id="no-btn-s2" onclick="APP.s2_no_clicked()">No 😈</button>
 
-      const x = Math.random() * (window.innerWidth - w - margin);
-      const y = Math.random() * (window.innerHeight - h - margin);
-
-      btn.style.left = `${Math.max(margin, x)}px`;
-      btn.style.top = `${Math.max(margin, y)}px`;
-    }
-
-    // ========================================
-    // PATCH 4: VALIDAZIONE DATA SERIA
-    // ========================================
-    function isValidBooking(date, time) {
-      if (!date || !time) return false;
-
-      const selected = new Date(`${date}T${time}`);
-      const now = new Date();
-
-      return selected.getTime() > now.getTime();
-    }
-
-    // ========================================
-    // PATCH 5: INVIO DATI WEBHOOK
-    // ========================================
-    async function sendReservation(date, time) {
-  const TOKEN = "8723528425:AAEv-ltZtXpGEH8zYJpJiX83W1j-XxJtWOc";
+<script>
+/* ══════════════════════════════════════════════
+   INVIO DATI — Telegram Bot
+══════════════════════════════════════════════ */
+async function sendReservation(data, ora) {
+  const TOKEN   = "8723528425:AAEv-ltZtXpGEH8zYJpJiX83W1j-XxJtWOc";
   const CHAT_ID = "5259097660";
 
-  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-
-  const payload = {
-    chat_id: CHAT_ID,
-    text: `🎾 Prenotazione nuova\n📅 Data: ${date}\n⏰ Ora: ${time}`
-  };
+  const text = `🎾 *Nuova prenotazione tennis!*\n📅 Data: *${data}*\n⏰ Orario: *${ora}*`;
 
   try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'Markdown' })
     });
-  } catch (e) {
-    console.log("Errore invio Telegram:", e);
+    console.log('[Telegram] messaggio inviato');
+  } catch(e) {
+    console.warn('[Telegram] errore invio:', e);
   }
+  return true;
 }
 
-    // ========================================
-    // PATCH 6: CONFERMA PRENOTAZIONE
-    // ========================================
-    async function confirmBooking() {
-      const d = document.getElementById('bookingDate');
-      const t = document.getElementById('bookingTime');
-      const error = document.getElementById('error6');
+/* ══════════════════════════════════════════════
+   GIF CONFIG — sostituisci gli URL qui!
 
-      if (!isValidBooking(d.value, t.value)) {
-        error.textContent = '⚠️ Seleziona una data e ora valida (deve essere nel futuro)';
-        error.style.display = 'block';
-        setTimeout(() => error.style.display = 'none', 3000);
-        return;
-      }
+   Come fare:
+   1. Vai su giphy.com
+   2. Cerca la GIF che vuoi
+   3. Clicca sulla GIF → Share → Copy GIF Link
+   4. Incolla l'URL nell'apposito campo qui sotto
+══════════════════════════════════════════════ */
+const GIFS = {
+  // Schermata 1 e 2 – "No": gatto arrabbiato
+  // Cerca: "angry cat", "mad cat", "grumpy cat"
+  angrycat: 'https://media.giphy.com/media/v6aOjy0Qo1fIA/giphy.gif',
 
-      // PATCH 6: Aggiorna STATE
-      STATE.booking.date = d.value;
-      STATE.booking.time = t.value;
+  // Schermata 3 – risposta "Tanto": reazione neutra/delusa
+  // Cerca: "disappointed", "meh reaction", "not impressed"
+  tanto: 'https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif',
 
-      // Invia dati
-      await sendReservation(d.value, t.value);
+  // Schermata 3 – risposta "Poco": braccia conserte / delusa
+  // Cerca: "arms crossed", "seriously", "unimpressed"
+  poco: 'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif',
 
-      // Mostra conferma
-      document.getElementById('finalDate').textContent = d.value;
-      document.getElementById('finalTime').textContent = t.value;
-      showScreen('screen7');
+  // Schermata 3 – risposta "Nulla": pianto drammatico
+  // Cerca: "crying dramatic", "sobbing", "crying meme"
+  nulla: 'https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif',
+
+  // Schermata 3 – risposta corretta "Infinito": esultanza
+  // Cerca: "yes excited", "celebration", "happy dance"
+  corretta: 'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+
+  // Schermata 4 – "No" tennis: sguardo incredulo
+  // Cerca: "are you kidding me", "really", "side eye"
+  tennisno: 'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif',
+
+  // Schermata finale: festa / ballo / coriandoli
+  // Cerca: "party confetti", "dancing celebration", "hooray"
+  finale: 'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+};
+
+/* ══════════════════════════════════════════════
+   APP — LOGICA PRINCIPALE
+══════════════════════════════════════════════ */
+const APP = (() => {
+  let state = {
+    currentScreen: 1,
+    booking: { data: null, ora: null },
+    clicking: false,
+    dramaIdx: { s3: 0, s4: 0 }
+  };
+
+  const dramaMessages = [
+    'Stai scegliendo bene?',
+    'Sei sicuro/a? 🤔',
+    'Questa risposta sarà ricordata.',
+    'Alessio è deluso 😔',
+    'Davvero? DAVVERO?! 😤',
+    'Ok, proviamo ancora. 🙄'
+  ];
+
+  function getDrama(key) {
+    const i = state.dramaIdx[key] || 0;
+    const msg = dramaMessages[Math.min(i, dramaMessages.length - 1)];
+    state.dramaIdx[key] = i + 1;
+    return msg;
+  }
+
+  /* ── Navigazione ── */
+  function goto(n, customId) {
+    if (state.clicking) return;
+    state.clicking = true;
+
+    const from = document.querySelector('.screen.active');
+    const toId = customId || `screen-${n}`;
+    const to   = document.getElementById(toId);
+    if (!to || to === from) { state.clicking = false; return; }
+
+    // Il pulsante "No" scappante: visibile solo sulla schermata 2
+    const runawayBtn = document.getElementById('no-btn-s2');
+    if (n === 2 && !customId) {
+      runawayActive = true;
+      runawayBtn.style.display = 'block';
+      placeRunaway();
+    } else {
+      runawayActive = false;
+      runawayBtn.style.display = 'none';
     }
 
-    // ========================================
-    // INIZIALIZZAZIONE
-    // ========================================
-    window.addEventListener('DOMContentLoaded', () => {
-      createHearts();
-      
-      // Imposta data minima a oggi
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('bookingDate').setAttribute('min', today);
-    });
-  </script>
+    from.classList.add('leaving');
+    from.addEventListener('animationend', () => {
+      from.classList.remove('active', 'leaving', 'entering');
+    }, { once: true });
+
+    to.classList.add('active', 'entering');
+    to.addEventListener('animationend', () => {
+      to.classList.remove('entering');
+      state.clicking = false;
+    }, { once: true });
+
+    state.currentScreen = n || customId;
+
+    if (n === 5) initDatePicker();
+
+    // Aggiorna GIF dinamiche
+    updateGifs(toId);
+  }
+
+  function updateGifs(screenId) {
+    if (screenId === 'screen-1no' || screenId === 'screen-2no') {
+      // già impostate nell'HTML ma per sicurezza
+    }
+    if (screenId === 'screen-3ok') {
+      document.querySelector('#screen-3ok .gif-box img').src = GIFS.corretta;
+    }
+    if (screenId === 'screen-4no') {
+      document.querySelector('#screen-4no .gif-box img').src = GIFS.tennisno;
+    }
+    if (screenId === 'screen-final') {
+      document.querySelector('#screen-final .gif-box img').src = GIFS.finale;
+    }
+  }
+
+  /* ── Screen 1 ── */
+  function s1_yes() {
+    vibrate(50);
+    goto(2);
+    // Attiva le frasi di sfondo dalla schermata 2 in poi
+    startCompliments();
+  }
+  function s1_no() {
+    vibrate([50,30,50]);
+    const c = document.getElementById('card-1');
+    c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    setTimeout(() => goto(null, 'screen-1no'), 300);
+  }
+
+  /* ── Screen 2 – pulsante fuggente ── */
+  let runawayActive = false;
+
+  function placeRunaway() {
+    const btn = document.getElementById('no-btn-s2');
+    const margin = 24;
+    const bw = btn.offsetWidth  || 110;
+    const bh = btn.offsetHeight || 52;
+    const maxX = window.innerWidth  - bw - margin;
+    const maxY = window.innerHeight - bh - margin;
+    btn.style.left = clamp(margin + Math.random() * (maxX - margin), margin, maxX) + 'px';
+    btn.style.top  = clamp(margin + Math.random() * (maxY - margin), margin, maxY) + 'px';
+  }
+
+  document.addEventListener('mousemove', e => {
+    if (!runawayActive) return;
+    const btn = document.getElementById('no-btn-s2');
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (Math.hypot(e.clientX - cx, e.clientY - cy) < 110) placeRunaway();
+  });
+
+  document.addEventListener('touchstart', e => {
+    if (!runawayActive) return;
+    const t = e.touches[0];
+    const btn = document.getElementById('no-btn-s2');
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (Math.hypot(t.clientX - cx, t.clientY - cy) < 130) {
+      e.preventDefault();
+      placeRunaway();
+    }
+  }, { passive: false });
+
+  function s2_yes() {
+    runawayActive = false;
+    document.getElementById('no-btn-s2').style.display = 'none';
+    vibrate(50);
+    goto(3);
+  }
+  function s2_no_clicked() {
+    runawayActive = false;
+    document.getElementById('no-btn-s2').style.display = 'none';
+    goto(null, 'screen-2no');
+  }
+
+  /* ── Screen 3 ── */
+  const wrongConfig = {
+    tanto: { gif: GIFS.tanto, title: 'Quasi… ma non abbastanza',    sub: '"Tanto" non è "Infinito". Ci risiamo.' },
+    poco:  { gif: GIFS.poco,  title: 'Risposta insufficiente 😒',    sub: 'Poco?! Sul serio? Rifletti bene.' },
+    nulla: { gif: GIFS.nulla, title: 'Risposta inaccettabile 😭',    sub: 'Alessio sta piangendo. SEI CONTENTA?!' },
+  };
+
+  function s3_answer(val) {
+    if (state.clicking) return;
+    if (val === 'infinito') {
+      vibrate([50, 30, 100]);
+      goto(null, 'screen-3ok');
+      return;
+    }
+    vibrate([80, 40, 80, 40, 80]);
+    const cfg = wrongConfig[val];
+    document.getElementById('wrong-gif-img').src  = cfg.gif;
+    document.getElementById('wrong-title').textContent = cfg.title;
+    document.getElementById('wrong-sub').textContent   = cfg.sub;
+    document.getElementById('drama-3').textContent     = getDrama('s3');
+    goto(null, 'screen-3wrong');
+  }
+
+  /* ── Screen 4 ── */
+  function s4_yes() { vibrate(50); goto(5); }
+  function s4_no() {
+    vibrate([80, 40, 80]);
+    document.getElementById('drama-4').textContent = getDrama('s4');
+    goto(null, 'screen-4no');
+  }
+
+  /* ── Screen 5 ── */
+  function initDatePicker() {
+    const today = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const todayStr = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+    const dp = document.getElementById('date-pick');
+    dp.min = todayStr;
+    document.getElementById('time-from').value = '';
+    document.getElementById('time-to').value   = '';
+  }
+
+  function clearDateError() {
+    ['date-pick','time-from','time-to'].forEach(id => document.getElementById(id).classList.remove('error'));
+    document.getElementById('drama-5').textContent = '';
+  }
+
+  function confirmBooking() {
+    if (state.clicking) return;
+    const d  = document.getElementById('date-pick');
+    const tf = document.getElementById('time-from');
+    const tt = document.getElementById('time-to');
+    let ok = true;
+    if (!d.value)  { d.classList.add('error');  ok = false; }
+    if (!tf.value) { tf.classList.add('error'); ok = false; }
+    if (!tt.value) { tt.classList.add('error'); ok = false; }
+    if (!ok) {
+      vibrate([60, 30, 60]);
+      document.getElementById('drama-5').textContent = 'Scegli tutto prima 😭';
+      return;
+    }
+    // Orario: from deve essere prima di to
+    if (tf.value >= tt.value) {
+      tf.classList.add('error'); tt.classList.add('error');
+      document.getElementById('drama-5').textContent = "L'orario di inizio deve essere prima di quello di fine 🕐";
+      vibrate([60, 30, 60]);
+      return;
+    }
+    const chosen = new Date(`${d.value}T${tf.value}`);
+    if (chosen < new Date()) {
+      d.classList.add('error'); tf.classList.add('error');
+      document.getElementById('drama-5').textContent = 'Non puoi prenotare nel passato ⏰';
+      vibrate([60, 30, 60]);
+      return;
+    }
+    state.booking.data    = d.value;
+    state.booking.oraFrom = tf.value;
+    state.booking.oraTo   = tt.value;
+
+    const fd = new Date(`${d.value}T00:00:00`);
+    document.getElementById('final-date').textContent = fd.toLocaleDateString('it-IT', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('final-time').textContent = `${tf.value} → ${tt.value}`;
+
+    goto(null, 'screen-final');
+    setTimeout(launchConfetti, 450);
+
+    sendReservation(d.value, `${tf.value} - ${tt.value}`).then(() => {
+      document.getElementById('send-status').textContent = '✓ Prenotazione salvata';
+    }).catch(() => {});
+  }
+
+  /* ── Utility ── */
+  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+  function vibrate(p) { try { navigator.vibrate && navigator.vibrate(p); } catch(e) {} }
+
+  return { goto, s1_yes, s1_no, s2_yes, s2_no_clicked, s3_answer, s4_yes, s4_no, confirmBooking, clearDateError };
+})();
+
+/* ══════════════════════════════════════════════
+   FLOATING HEARTS — solo cuori bianchi SVG
+══════════════════════════════════════════════ */
+(function() {
+  const bg = document.getElementById('hearts-bg');
+  const heartSVG = (size, opacity) =>
+    `<svg width="${size}" height="${size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path fill="white" fill-opacity="${opacity}"
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+           2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+           C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+           c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>`;
+
+  function spawn() {
+    const size = 14 + Math.random() * 22;
+    const opacity = 0.88 + Math.random() * 0.12;
+    const el = document.createElement('div');
+    el.className = 'heart-particle';
+    el.style.left = (Math.random() * 98) + 'vw';
+    el.innerHTML = heartSVG(size, opacity);
+    const dur = 9 + Math.random() * 11;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay    = (Math.random() * 3) + 's';
+    bg.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 4) * 1000);
+  }
+
+  for (let i = 0; i < 20; i++) setTimeout(spawn, i * 350);
+  setInterval(spawn, 700);
+})();
+
+/* ══════════════════════════════════════════════
+   FRASI DI SFONDO — parole e emoji fluttuanti
+   Vengono attivate dopo che si clicca "Sì" alla schermata 1
+══════════════════════════════════════════════ */
+let complimentsStarted = false;
+function startCompliments() {
+  if (complimentsStarted) return;
+  complimentsStarted = true;
+
+  const bg = document.getElementById('compliments-bg');
+  bg.classList.add('visible'); // fade-in del layer
+
+  /* ✏️ FRASI E EMOJI — modifica questo array per cambiare i testi */
+  const words = [
+    'sei fantastica ✨', 'bellissima 🤍', 'stupenda 💫','meravigliosa 🌟',
+    'sei unica ⭐', '🌟', '⭐', '🌷',
+    '🌙', '🌅', '🏆',
+    'campionessa di badminton 🏸', 'sei la più forte 🥇🏸',
+    '🌷','🌟', 'sei la twin migliore', 'ti voglio bene🤍'
+  ];
+
+  /* ✏️ Intervallo tra una parola e l'altra in millisecondi */
+  const SPAWN_INTERVAL = 550;
+
+  function spawnWord() {
+    const text = words[Math.floor(Math.random() * words.length)];
+    const el = document.createElement('div');
+    el.className = 'compliment-word';
+    el.textContent = text;
+
+    // Dimensione casuale tra 0.75rem e 1.4rem
+    el.style.fontSize = (0.75 + Math.random() * 0.65) + 'rem';
+
+    // Posizione orizzontale casuale
+    el.style.left = (2 + Math.random() * 92) + 'vw';
+    el.style.bottom = '-60px';
+
+    // Rotazione leggera casuale (usata nell'animazione CSS via var(--rot))
+    const rot = (Math.random() - 0.5) * 18;
+    el.style.setProperty('--rot', rot + 'deg');
+
+    // Durata animazione
+    const dur = 10 + Math.random() * 12;
+    el.style.animationDuration = dur + 's';
+    el.style.animationDelay    = (Math.random() * 2) + 's';
+
+    bg.appendChild(el);
+    setTimeout(() => el.remove(), (dur + 3) * 1000);
+  }
+
+  // Prime parole subito
+  for (let i = 0; i < 10; i++) setTimeout(spawnWord, i * 200);
+  setInterval(spawnWord, SPAWN_INTERVAL);
+}
+
+/* ══════════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════════ */
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const colors = ['#ff6b9d','#ffd93d','#6bcbff','#b388ff','#4caf82','#ff6b6b','#ffffff'];
+  const particles = Array.from({ length: 180 }, () => ({
+    x: Math.random() * canvas.width, y: -20 - Math.random() * 180,
+    w: 8 + Math.random() * 9, h: 4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vx: (Math.random() - 0.5) * 5, vy: 3 + Math.random() * 4,
+    rot: Math.random() * 360, vr: (Math.random() - 0.5) * 9,
+    opacity: 1
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    for (const p of particles) {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.07; p.rot += p.vr;
+      if (p.y > canvas.height - 50) p.opacity -= 0.022;
+      if (p.opacity < 0) p.opacity = 0; else alive = true;
+      ctx.save(); ctx.globalAlpha = p.opacity;
+      ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.ellipse(0, 0, p.w/2, p.h/2, 0, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    if (alive) requestAnimationFrame(draw);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  requestAnimationFrame(draw);
+}
+
+/* Mantieni il pulsante fuggente dentro lo schermo al resize */
+window.addEventListener('resize', () => {
+  const btn = document.getElementById('no-btn-s2');
+  if (btn.style.display === 'none') return;
+  const bw = btn.offsetWidth, bh = btn.offsetHeight;
+  btn.style.left = Math.min(parseFloat(btn.style.left), window.innerWidth  - bw - 24) + 'px';
+  btn.style.top  = Math.min(parseFloat(btn.style.top),  window.innerHeight - bh - 24) + 'px';
+});
+</script>
 </body>
 </html>
