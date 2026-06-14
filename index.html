@@ -6,38 +6,17 @@
 <title>Una sorpresa per te 🎾</title>
 <style>
   :root {
-    /* =========================================================
-       🎨 COLORI PRINCIPALI — modifica questi per cambiare tema
-       =========================================================
-       Tema attuale: BLU
-       Per tornare al rosa originale sostituisci con:
-         --primary:       #ff6b9d
-         --primary-light: #ffb3d0
-         --primary-pale:  #fff0f6
-         --primary-dark:  #ff4081
-         --bg:            #f0c8d8
-         --shadow:        0 8px 32px rgba(180,80,120,0.22)
-         --shadow-hover:  0 12px 40px rgba(180,80,120,0.38)
-         --text:          #3d2b3d
-         --text-light:    #8a6b8a
-    ========================================================= */
-
-    /* 🔵 Colore principale — bottoni, bordi, accenti */
     --primary:       #4a90d9;
     --primary-light: #a8cdf0;
     --primary-pale:  #eaf3fc;
     --primary-dark:  #1a6bbf;
-
-    /* 🌅 SFONDO PAGINA — cambia solo questo per cambiare lo sfondo */
     --bg: #1e3a5f;
-
     --coral: #ff6b6b;
     --green: #4caf82;
     --text:       #1a2a3d;
     --text-light: #5a7a9a;
     --shadow:       0 8px 32px rgba(30,60,100,0.28);
     --shadow-hover: 0 12px 40px rgba(30,60,100,0.42);
-
     --pink:       var(--primary);
     --pink-light: var(--primary-light);
     --pink-pale:  var(--primary-pale);
@@ -56,7 +35,6 @@
     user-select: none;
   }
 
-  /* ── HEARTS BACKGROUND ── */
   #hearts-bg {
     position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
   }
@@ -74,38 +52,36 @@
     100% { transform: translateY(-115vh) rotate(18deg) scale(1.15); opacity: 0; }
   }
 
-  /* ── FRASI DI SFONDO ──
-     Fix glitch: uso transform: translateY invece di bottom animato,
-     e will-change solo su opacity/transform per evitare il flickering */
   #compliments-bg {
     position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
-    opacity: 0;
-    transition: opacity 1.2s ease;
+    opacity: 0; transition: opacity 1.2s ease;
   }
   #compliments-bg.visible { opacity: 1; }
   .compliment-word {
     position: absolute;
-    bottom: -80px; /* parte sempre da sotto, poi viene spostata via transform */
-    /* 🎨 Colore frasi di sfondo */
-    color: rgba(255, 255, 255, 0.28);
+    bottom: -80px;
+    color: rgba(255,255,255,0.28);
     font-weight: 700;
     white-space: nowrap;
-    /* Fix glitch: niente scale nell'animazione, solo translateY e opacity */
     animation: floatWord linear both;
     will-change: transform, opacity;
     letter-spacing: 0.03em;
-    /* Fix glitch: forza rendering su GPU separato */
     transform: translateZ(0);
     backface-visibility: hidden;
   }
   @keyframes floatWord {
-    0%   { transform: translateZ(0) translateY(0);       opacity: 0;   }
+    0%   { transform: translateZ(0) translateY(0);      opacity: 0; }
     8%   { opacity: 1; }
     90%  { opacity: 0.75; }
-    100% { transform: translateZ(0) translateY(-120vh);  opacity: 0;   }
+    100% { transform: translateZ(0) translateY(-120vh); opacity: 0; }
   }
 
-  /* ── STAGE ── */
+  /* Layer dedicato pollici in giù */
+  #thumbs-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    display: none;
+  }
+
   #stage {
     position: relative; z-index: 1;
     min-height: 100dvh;
@@ -113,7 +89,6 @@
     padding: 20px;
   }
 
-  /* ── SCREENS ── */
   .screen {
     display: none;
     flex-direction: column; align-items: center; justify-content: center;
@@ -130,7 +105,6 @@
   @keyframes screenIn  { from { opacity:0; transform: translateY(28px) scale(0.96); } to { opacity:1; transform: translateY(0) scale(1); } }
   @keyframes screenOut { from { opacity:1; transform: translateY(0) scale(1); } to { opacity:0; transform: translateY(-28px) scale(0.96); } }
 
-  /* ── CARD ── */
   .card {
     background: white;
     border-radius: 28px;
@@ -140,13 +114,11 @@
     display: flex; flex-direction: column; align-items: center; gap: 18px;
   }
 
-  /* ── TYPOGRAPHY ── */
   h1 { font-size: clamp(1.4rem, 5vw, 2rem); font-weight: 800; line-height: 1.25; }
   h2 { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 700; line-height: 1.3; }
   .subtitle { font-size: 0.97rem; color: var(--text-light); line-height: 1.55; }
   .drama-text { font-size: 1rem; font-weight: 600; color: var(--coral); min-height: 1.4em; }
 
-  /* ── BUTTONS ── */
   .btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
   .btn {
     padding: 14px 28px; border: none; border-radius: 50px;
@@ -159,14 +131,15 @@
   .btn:not(:disabled):hover  { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
   .btn:not(:disabled):active { transform: scale(0.96); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
   .btn-primary   { background: linear-gradient(135deg, var(--pink), var(--rose)); color: white; box-shadow: 0 4px 18px rgba(74,144,217,0.35); }
   .btn-secondary { background: white; color: var(--pink); border: 2px solid var(--pink-light); }
   .btn-success   { background: linear-gradient(135deg, #4caf82, #2e7d57); color: white; box-shadow: 0 4px 18px rgba(76,175,130,0.35); }
 
-  /* ── GIF BOX ── */
+  /* ── GIF BOX ──
+     Contiene sia <img> normali che embed Tenor.
+     overflow:hidden taglia tutto quello che esce. */
   .gif-box {
-    width: 180px; height: 180px;
+    width: 200px; height: 180px;
     border-radius: 20px; overflow: hidden;
     box-shadow: 0 4px 20px rgba(0,0,0,0.13);
     background: var(--pink-pale);
@@ -178,8 +151,24 @@
     object-fit: cover; border-radius: 20px;
     display: block;
   }
+  /* Tenor embed dentro gif-box: forza dimensioni corrette */
+  .gif-box .tenor-gif-embed,
+  .gif-box iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+    border-radius: 20px;
+  }
+  /* GIF dirette (tag img) senza gif-box wrapper */
+  .gif-inline {
+    width: 200px; height: 160px;
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
 
-  /* ── OPTIONS GRID ── */
   .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
   .option-btn {
     padding: 18px 10px; border: 2.5px solid var(--pink-light);
@@ -191,32 +180,22 @@
   }
   .option-btn:hover  { border-color: var(--pink); background: var(--pink-pale); transform: translateY(-2px); box-shadow: var(--shadow); }
   .option-btn:active { transform: scale(0.95); }
-  .option-btn.selected { border-color: var(--pink); background: var(--pink-pale); box-shadow: 0 0 0 3px rgba(74,144,217,0.2); }
   .option-btn .emoji { font-size: 1.8rem; }
 
-  /* ── POSTO SELEZIONE — 3 opzioni a larghezza piena ── */
-  .posto-grid {
-    display: flex; flex-direction: column; gap: 10px; width: 100%;
-  }
+  .posto-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
   .posto-btn {
     padding: 16px 20px; border: 2.5px solid var(--pink-light);
     border-radius: 16px; background: white; color: var(--text);
     font-size: 1rem; font-weight: 700; cursor: pointer;
     transition: all 0.18s; display: flex; align-items: center; gap: 12px;
-    -webkit-tap-highlight-color: transparent;
-    text-align: left;
+    -webkit-tap-highlight-color: transparent; text-align: left;
   }
   .posto-btn:hover  { border-color: var(--pink); background: var(--pink-pale); transform: translateX(4px); }
   .posto-btn:active { transform: scale(0.98); }
-  .posto-btn.selected {
-    border-color: var(--pink);
-    background: var(--pink-pale);
-    box-shadow: 0 0 0 3px rgba(74,144,217,0.2);
-  }
+  .posto-btn.selected { border-color: var(--pink); background: var(--pink-pale); box-shadow: 0 0 0 3px rgba(74,144,217,0.2); }
   .posto-btn .posto-icon { font-size: 1.5rem; flex-shrink: 0; }
   .posto-btn .posto-name { font-size: 1.05rem; font-weight: 800; }
 
-  /* ── DATE/TIME ── */
   .field-group { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
   .field-label { font-size: 0.82rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.07em; }
   input[type="date"], input[type="time"] {
@@ -229,7 +208,6 @@
   input:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(74,144,217,0.15); }
   input.error { border-color: var(--coral); box-shadow: 0 0 0 4px rgba(255,107,107,0.15); animation: shake 0.4s; }
 
-  /* ── BOOKING SUMMARY ── */
   .booking-details {
     background: var(--pink-pale); border-radius: 18px; padding: 18px 22px;
     width: 100%; display: flex; flex-direction: column; gap: 10px;
@@ -239,20 +217,16 @@
   .detail-label { color: var(--text-light); font-weight: 600; font-size: 0.95rem; }
   .detail-value { font-weight: 800; color: var(--pink); font-size: 1.05rem; }
 
-  /* ── PROGRESS DOTS ── */
   .progress { display: flex; gap: 8px; align-items: center; justify-content: center; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.3s; }
   .dot.active { background: white; transform: scale(1.5); box-shadow: 0 0 0 3px rgba(255,255,255,0.4); }
   .dot.done   { background: var(--green); }
 
-  /* ── BADGE ── */
   .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; font-size: 0.88rem; font-weight: 700; }
   .badge-success { background: #e8f5e9; color: var(--green); }
 
-  /* ── CONFETTI ── */
   #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
 
-  /* ── ANIMATIONS ── */
   @keyframes shake {
     0%,100% { transform: translateX(0); }
     20% { transform: translateX(-8px); }
@@ -262,12 +236,10 @@
   }
   @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   @keyframes pulse  { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-
   .shake  { animation: shake 0.45s ease-in-out; }
   .bounce { animation: bounce 0.8s ease-in-out infinite; }
   .pulse  { animation: pulse 1.2s ease-in-out infinite; }
 
-  /* ── RUNAWAY NO BUTTON ── */
   #no-btn-s2 {
     display: none;
     position: fixed; z-index: 20;
@@ -275,11 +247,9 @@
     background: white; color: var(--pink);
     border: 2px solid var(--pink-light);
     font-size: 1rem; font-weight: 700;
-    cursor: pointer; touch-action: none;
-    transition: none;
+    cursor: pointer; touch-action: none; transition: none;
   }
 
-  /* ── RESPONSIVE ── */
   @media (max-width: 360px) {
     .card { padding: 22px 14px; }
     .options-grid { gap: 8px; }
@@ -296,6 +266,7 @@
 
 <div id="hearts-bg"></div>
 <div id="compliments-bg"></div>
+<div id="thumbs-bg"></div>
 <canvas id="confetti-canvas"></canvas>
 
 <div id="stage">
@@ -306,7 +277,15 @@
       <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
     <div class="card" id="card-1">
-      <div class="tenor-gif-embed" data-postid="23546617" data-share-method="host" data-aspect-ratio="1.89349" data-width="100%"><a href="https://tenor.com/view/penguins-of-madagascar-skipper-who-are-you-madagascar-gif-23546617">Penguins Of Madagascar Skipper GIF</a>from <a href="https://tenor.com/search/penguins+of+madagascar-gifs">Penguins Of Madagascar GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+      <!--
+        GIF schermata 1 — embed Tenor funziona qui perché non viene toccata dal JS
+        Puoi usare sia embed Tenor che <img src="..."> diretto
+      -->
+      <div class="gif-box">
+        <div class="tenor-gif-embed" data-postid="23546617" data-share-method="host" data-aspect-ratio="1.89349" data-width="100%">
+          <a href="https://tenor.com/view/penguins-of-madagascar-skipper-who-are-you-madagascar-gif-23546617">Penguins GIF</a>
+        </div>
+      </div>
       <h1>Sei la migliore amica di Alessio?</h1>
       <p class="subtitle">Prima di procedere, dobbiamo accertarcelo</p>
       <div class="btn-row">
@@ -320,6 +299,10 @@
   <!-- ════════════════ SCREEN 1 – NO ════════════════ -->
   <div class="screen" id="screen-1no">
     <div class="card">
+      <!--
+        🎭 GIF schermata No — usa <img src="URL_DIRETTO"> con link da Tenor (tasto destro → copia indirizzo immagine)
+        oppure lascia l'embed Tenor — entrambi funzionano qui perché il JS non la tocca
+      -->
       <div class="gif-box">
         <img src="https://media.giphy.com/media/v6aOjy0Qo1fIA/giphy.gif" alt="gatto arrabbiato">
       </div>
@@ -335,11 +318,14 @@
       <div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
     <div class="card">
-      <img src="https://media.tenor.com/Rymj4MuTQIEAAAAj/peach-cat.gif" alt="3">
+      <!--
+        🎭 GIF schermata 2 — embed Tenor o img diretto, entrambi ok qui
+      -->
+      <img class="gif-inline" src="https://media.tenor.com/Rymj4MuTQIEAAAAj/peach-cat.gif" alt="gatto">
       <h1>Vuoi bene al tuo migliore amico?</h1>
       <p class="subtitle">Attenta alla risposta che dai</p>
       <div class="btn-row" style="justify-content:center">
-        <button class="btn btn-primary" style="flex:0 0 auto;min-width:160px" onclick="APP.s2_yes()">Sì tantissimo🤍</button>
+        <button class="btn btn-primary" style="flex:0 0 auto;min-width:160px" onclick="APP.s2_yes()">Sì tantissimo 🤍</button>
       </div>
       <div class="drama-text" id="drama-2"></div>
     </div>
@@ -363,7 +349,7 @@
       <div class="dot done"></div><div class="dot done"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
     <div class="card">
-		<img src="https://media.tenor.com/48VyHp5jScAAAAAj/face-emoji.gif" alt="2">
+      <img class="gif-inline" src="https://media.tenor.com/48VyHp5jScAAAAAj/face-emoji.gif" alt="emoji">
       <h1>Quanto vuoi bene ad Alessio?</h1>
       <p class="subtitle">Scegli con cura. Il futuro dipende da questa risposta.</p>
       <div class="options-grid">
@@ -387,7 +373,11 @@
   <!-- ════════════════ SCREEN 3 – RISPOSTA SBAGLIATA ════════════════ -->
   <div class="screen" id="screen-3wrong">
     <div class="card">
-      <div class="gif-box" id="wrong-gif-box">
+      <!--
+        Questa GIF viene cambiata dal JS in base alla risposta
+        DEVE essere un <img> con id="wrong-gif-img" — non usare embed Tenor qui
+      -->
+      <div class="gif-box">
         <img id="wrong-gif-img" src="" alt="reazione">
       </div>
       <h2 id="wrong-title">Quasi…</h2>
@@ -402,12 +392,13 @@
   <!-- ════════════════ SCREEN 3 – CORRETTA ════════════════ -->
   <div class="screen" id="screen-3ok">
     <div class="card">
+      <!--
+        Questa GIF viene cambiata dal JS — DEVE essere <img> con id="gif-3ok"
+        Metti qui il link diretto (tasto destro su Tenor → copia indirizzo immagine)
+        es: https://media.tenor.com/xxxxx/nome.gif
+      -->
       <div class="gif-box bounce">
-        <!--
-          🎭 GIF risposta corretta — incolla qui il tuo URL da tenor.com
-          Cerca: "yes excited", "celebration", "happy dance"
-        -->
-        <div class="tenor-gif-embed" data-postid="3059366611820476269" data-share-method="host" data-aspect-ratio="1" data-width="100%"><a href="https://tenor.com/view/cr7-celebration-gif-3059366611820476269">Cr7 Celebration GIF</a>from <a href="https://tenor.com/search/cr7+celebration-gifs">Cr7 Celebration GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+        <img id="gif-3ok" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="esultanza">
       </div>
       <div class="badge badge-success">✅ Risposta corretta!</div>
       <h2>Bravaaaa, meriti una ricompensa</h2>
@@ -436,12 +427,11 @@
   <!-- ════════════════ SCREEN 4 – NO ════════════════ -->
   <div class="screen" id="screen-4no">
     <div class="card">
+      <!--
+        Questa GIF viene cambiata dal JS — DEVE essere <img> con id="gif-4no"
+      -->
       <div class="gif-box">
-        <!--
-          🎭 GIF rifiuto tennis — incolla qui il tuo URL da tenor.com
-          Cerca: "are you kidding me", "disappointed", "side eye"
-        -->
-        <div class="tenor-gif-embed" data-postid="14778582" data-share-method="host" data-aspect-ratio="1.07383" data-width="100%"><a href="https://tenor.com/view/no-meong-cat-sad-bike-gif-14778582">No Meong Sticker</a>from <a href="https://tenor.com/search/no-stickers">No Stickers</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+        <img id="gif-4no" src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="sguardo incredulo">
       </div>
       <h2>Va bene</h2>
       <p class="subtitle">Addio</p>
@@ -458,8 +448,6 @@
       <div style="font-size:2.5rem">📍</div>
       <h2>Dove vuoi giocare?</h2>
       <p class="subtitle">Scegli il campo che preferisci</p>
-
-      <!-- ✏️ POSTI — modifica nomi e emoji qui -->
       <div class="posto-grid">
         <button class="posto-btn" onclick="APP.selectPosto('Camposampiero')" id="posto-camposampiero">
           <span class="posto-icon">🎾</span>
@@ -474,11 +462,8 @@
           <span class="posto-name">Silvelle</span>
         </button>
       </div>
-
       <div class="drama-text" id="drama-posto"></div>
-      <button class="btn btn-success" onclick="APP.confirmPosto()" style="width:100%">
-        Avanti → 📅
-      </button>
+      <button class="btn btn-success" onclick="APP.confirmPosto()" style="width:100%">Avanti → 📅</button>
     </div>
   </div>
 
@@ -513,16 +498,13 @@
   <!-- ════════════════ SCREEN FINALE ════════════════ -->
   <div class="screen" id="screen-final">
     <div class="card" style="gap:16px">
-      <div class="gif-box pulse" style="width:160px;height:160px">
-        <!--
-          🎭 GIF finale festa — incolla qui il tuo URL da tenor.com
-          Cerca: "confetti celebration", "dancing happy", "party time"
-        -->
-		<div class="tenor-gif-embed" data-postid="11898425170767084543" data-share-method="host" data-aspect-ratio="1.05508" data-width="100%"><a href="https://tenor.com/view/jannik-sinner-sinner-jannik-sinner-gif-nitto-atp-finals-sinner-fritz-gif-11898425170767084543">Jannik Sinner Jannik Sinner Gif GIF</a>from <a href="https://tenor.com/search/jannik+sinner-gifs">Jannik Sinner GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
-		
-
-		</div>
- 
+      <!--
+        Questa GIF viene cambiata dal JS — DEVE essere <img> con id="gif-final"
+      -->
+      <div class="gif-box pulse" style="width:200px;height:180px">
+        <img id="gif-final" src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="festa">
+      </div>
+      <div style="font-size:2.2rem;letter-spacing:6px;line-height:1">🎾🎾🎾</div>
       <h1 style="color:var(--pink)">Finalmente ce l'hai fatta. Prenotazione confermata!</h1>
       <p style="font-size:1.1rem;font-weight:700;color:var(--text)">Ti aspetto in campo twinn</p>
       <div class="booking-details">
@@ -547,13 +529,15 @@
 
 <button id="no-btn-s2" onclick="APP.s2_no_clicked()">No 😈</button>
 
+<!-- Script Tenor — carica gli embed Tenor nella pagina -->
+<script async src="https://tenor.com/embed.js"></script>
+
 <script>
 /* ══════════════════════════════════════════════
    INVIO DATI — Telegram Bot
-   Invia: posto, data, orario
 ══════════════════════════════════════════════ */
 async function sendReservation(posto, data, ora) {
-  const TOKEN   = "8723528425:AAFwR-WNSDOmSnfC_qyJFDQEALBnOqSRFNA";
+  const TOKEN   = "8723528425:AAEv-ltZtXpGEH8zYJpJiX83W1j-XxJtWOc";
   const CHAT_ID = "5259097660";
 
   const text =
@@ -562,39 +546,40 @@ async function sendReservation(posto, data, ora) {
     `📅 Data: *${data}*\n` +
     `⏰ Orario: *${ora}*`;
 
- try {
-  const res = await fetch(
-    `https://api.telegram.org/bot${TOKEN}/sendMessage`,
-    {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text,
-        parse_mode: 'Markdown'
-      })
-    }
-  );
-
-  const data = await res.json();
-
-  console.log("STATUS:", res.status);
-  console.log("RISPOSTA:", data);
-
-} catch (e) {
-  console.error(e);
+      body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'Markdown' })
+    });
+    const json = await res.json();
+    console.log('[Telegram]', json);
+  } catch(e) {
+    console.warn('[Telegram] errore:', e);
+  }
+  return true;
 }
-}
+
 /* ══════════════════════════════════════════════
-   GIF CONFIG — incolla qui i tuoi URL da tenor.com
+   GIF CONFIG
+   ⚠️ Queste GIF vengono impostate via JS sulle schermate
+   che cambiano dinamicamente (3wrong, 3ok, 4no, finale).
+   USA SOLO link diretti che finiscono in .gif
+   (tasto destro sull'immagine su Tenor → "Copia indirizzo immagine")
+   NON usare embed Tenor qui — non funzionano via JS.
 ══════════════════════════════════════════════ */
 const GIFS = {
-  angrycat: 'https://media.giphy.com/media/v6aOjy0Qo1fIA/giphy.gif',
+  // Schermata risposta "Tanto"
   tanto:    'https://media.tenor.com/Ymx6CukbMM8AAAAj/penguin-more.gif',
+  // Schermata risposta "Poco"
   poco:     'https://media1.tenor.com/m/T2bjhpT3UJ0AAAAC/roll-over.gif',
+  // Schermata risposta "Nulla"
   nulla:    'https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif',
+  // Schermata risposta corretta "Infinito"
   corretta: 'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+  // Schermata No al tennis
   tennisno: 'https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif',
+  // Schermata finale
   finale:   'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
 };
 
@@ -625,7 +610,6 @@ const APP = (() => {
     return msg;
   }
 
-  /* ── Navigazione ── */
   function goto(n, customId) {
     if (state.clicking) return;
     state.clicking = true;
@@ -645,6 +629,13 @@ const APP = (() => {
       runawayBtn.style.display = 'none';
     }
 
+    // Gestione pollici: visibili solo su screen-1no
+    if (toId === 'screen-1no') {
+      burstThumbs();
+    } else {
+      stopThumbs();
+    }
+
     from.classList.add('leaving');
     from.addEventListener('animationend', () => {
       from.classList.remove('active', 'leaving', 'entering');
@@ -657,18 +648,19 @@ const APP = (() => {
     }, { once: true });
 
     state.currentScreen = n || customId;
-
     if (n === 6) initDatePicker();
+
+    // Aggiorna GIF — usa gli id dedicati, nessun querySelector che può fallire
     updateGifs(toId);
   }
 
-  function updateGifs(screenId) {
-    if (screenId === 'screen-3ok')  document.querySelector('#screen-3ok .gif-box img').src  = GIFS.corretta;
-    if (screenId === 'screen-4no')  document.querySelector('#screen-4no .gif-box img').src  = GIFS.tennisno;
-    if (screenId === 'screen-final') document.querySelector('#screen-final .gif-box img').src = GIFS.finale;
+  function updateGifs(toId) {
+    // Ogni GIF dinamica ha un id fisso — nessun rischio di null
+    if (toId === 'screen-3ok')    document.getElementById('gif-3ok').src   = GIFS.corretta;
+    if (toId === 'screen-4no')    document.getElementById('gif-4no').src   = GIFS.tennisno;
+    if (toId === 'screen-final')  document.getElementById('gif-final').src = GIFS.finale;
   }
 
-  /* ── Screen 1 ── */
   function s1_yes() {
     vibrate(50);
     goto(2);
@@ -678,11 +670,9 @@ const APP = (() => {
     vibrate([50,30,50]);
     const c = document.getElementById('card-1');
     c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
-    burstThumbs();
     setTimeout(() => goto(null, 'screen-1no'), 300);
   }
 
-  /* ── Screen 2 – pulsante fuggente ── */
   let runawayActive = false;
 
   function placeRunaway() {
@@ -700,7 +690,7 @@ const APP = (() => {
     if (!runawayActive) return;
     const btn = document.getElementById('no-btn-s2');
     const r = btn.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
     if (Math.hypot(e.clientX - cx, e.clientY - cy) < 110) placeRunaway();
   });
 
@@ -709,18 +699,16 @@ const APP = (() => {
     const t = e.touches[0];
     const btn = document.getElementById('no-btn-s2');
     const r = btn.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const cx = r.left + r.width/2, cy = r.top + r.height/2;
     if (Math.hypot(t.clientX - cx, t.clientY - cy) < 130) {
-      e.preventDefault();
-      placeRunaway();
+      e.preventDefault(); placeRunaway();
     }
   }, { passive: false });
 
   function s2_yes() {
     runawayActive = false;
     document.getElementById('no-btn-s2').style.display = 'none';
-    vibrate(50);
-    goto(3);
+    vibrate(50); goto(3);
   }
   function s2_no_clicked() {
     runawayActive = false;
@@ -728,11 +716,10 @@ const APP = (() => {
     goto(null, 'screen-2no');
   }
 
-  /* ── Screen 3 ── */
   const wrongConfig = {
-    tanto: { gif: GIFS.tanto, title: 'Quasi… ma non basta',  sub: '"Tanto" non è "Infinito" non lo accetto' },
-    poco:  { gif: GIFS.poco,  title: 'Risposta insufficiente 😒', sub: 'Poco?! Sul serio? Dopo tutto quello che ho fatto.' },
-    nulla: { gif: GIFS.nulla, title: 'Risposta inaccettabile 😭', sub: 'Alessio sta piangendo. SEI CONTENTA?!' },
+    tanto: { gif: GIFS.tanto, title: 'Quasi… ma non basta',         sub: '"Tanto" non è "Infinito", non lo accetto.' },
+    poco:  { gif: GIFS.poco,  title: 'Risposta insufficiente 😒',    sub: 'Poco?! Sul serio? Dopo tutto quello che ho fatto.' },
+    nulla: { gif: GIFS.nulla, title: 'Risposta inaccettabile 😭',    sub: 'Alessio sta piangendo. SEI CONTENTA?!' },
   };
 
   function s3_answer(val) {
@@ -744,14 +731,13 @@ const APP = (() => {
     }
     vibrate([80, 40, 80, 40, 80]);
     const cfg = wrongConfig[val];
-    document.getElementById('wrong-gif-img').src          = cfg.gif;
-    document.getElementById('wrong-title').textContent    = cfg.title;
-    document.getElementById('wrong-sub').textContent      = cfg.sub;
-    document.getElementById('drama-3').textContent        = getDrama('s3');
+    document.getElementById('wrong-gif-img').src       = cfg.gif;
+    document.getElementById('wrong-title').textContent = cfg.title;
+    document.getElementById('wrong-sub').textContent   = cfg.sub;
+    document.getElementById('drama-3').textContent     = getDrama('s3');
     goto(null, 'screen-3wrong');
   }
 
-  /* ── Screen 4 ── */
   function s4_yes() { vibrate(50); goto(5); }
   function s4_no() {
     vibrate([80, 40, 80]);
@@ -759,13 +745,9 @@ const APP = (() => {
     goto(null, 'screen-4no');
   }
 
-  /* ── Screen 5 – selezione posto ── */
   function selectPosto(nome) {
-    // Rimuove selezione precedente
     document.querySelectorAll('.posto-btn').forEach(b => b.classList.remove('selected'));
-    // Seleziona quello cliccato
-    const id = 'posto-' + nome.toLowerCase();
-    const btn = document.getElementById(id);
+    const btn = document.getElementById('posto-' + nome.toLowerCase());
     if (btn) btn.classList.add('selected');
     state.booking.posto = nome;
     document.getElementById('drama-posto').textContent = '';
@@ -780,12 +762,9 @@ const APP = (() => {
     goto(6);
   }
 
-  /* ── Screen 6 – data e ora ── */
   function initDatePicker() {
-    const pad = n => String(n).padStart(2, '0');
     // 📅 DATA MINIMA — cambia questa stringa per modificare da quando si può prenotare
-    const minDate = '2026-06-22';
-    document.getElementById('date-pick').min = minDate;
+    document.getElementById('date-pick').min = '2026-06-22';
     document.getElementById('time-from').value = '';
     document.getElementById('time-to').value   = '';
   }
@@ -815,9 +794,7 @@ const APP = (() => {
       vibrate([60, 30, 60]);
       return;
     }
-    const chosen = new Date(`${d.value}T${tf.value}`);
-    const minAllowed = new Date('2026-06-22T00:00:00');
-    if (chosen < minAllowed) {
+    if (new Date(`${d.value}T${tf.value}`) < new Date('2026-06-22T00:00:00')) {
       d.classList.add('error');
       document.getElementById('drama-5').textContent = 'Si può prenotare dal 22 giugno 2026 in poi 📅';
       vibrate([60, 30, 60]);
@@ -836,13 +813,11 @@ const APP = (() => {
     goto(null, 'screen-final');
     setTimeout(launchConfetti, 450);
 
-    const oraStr = `${tf.value} - ${tt.value}`;
-    sendReservation(state.booking.posto, d.value, oraStr).then(() => {
+    sendReservation(state.booking.posto, d.value, `${tf.value} - ${tt.value}`).then(() => {
       document.getElementById('send-status').textContent = '✓ Prenotazione salvata';
     }).catch(() => {});
   }
 
-  /* ── Utility ── */
   function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
   function vibrate(p) { try { navigator.vibrate && navigator.vibrate(p); } catch(e) {} }
 
@@ -862,93 +837,70 @@ const APP = (() => {
            C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
            c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>`;
-
   function spawn() {
-    const size    = 14 + Math.random() * 22;
+    const size = 14 + Math.random() * 22;
     const opacity = 0.88 + Math.random() * 0.12;
-    const el      = document.createElement('div');
-    el.className  = 'heart-particle';
+    const el = document.createElement('div');
+    el.className = 'heart-particle';
     el.style.left = (Math.random() * 98) + 'vw';
-    el.innerHTML  = heartSVG(size, opacity);
-    const dur     = 9 + Math.random() * 11;
+    el.innerHTML = heartSVG(size, opacity);
+    const dur = 9 + Math.random() * 11;
     el.style.animationDuration = dur + 's';
     el.style.animationDelay    = (Math.random() * 3) + 's';
     bg.appendChild(el);
     setTimeout(() => el.remove(), (dur + 4) * 1000);
   }
-
   for (let i = 0; i < 20; i++) setTimeout(spawn, i * 350);
   setInterval(spawn, 700);
 })();
 
 /* ══════════════════════════════════════════════
    FRASI DI SFONDO
-   Fix glitch: le parole vengono create con posizione
-   assoluta e animate solo via translateY, senza scale
-   e senza rotazione variabile (causa del flickering)
 ══════════════════════════════════════════════ */
 let complimentsStarted = false;
 function startCompliments() {
   if (complimentsStarted) return;
   complimentsStarted = true;
-
   const bg = document.getElementById('compliments-bg');
   bg.classList.add('visible');
-
-  /* ✏️ FRASI E EMOJI — modifica questo array per cambiare i testi */
   const words = [
     'sei fantastica ✨', 'bellissima 🤍', 'stupenda 💫', 'meravigliosa 🌟',
-    'sei unica ⭐', '🌟', '⭐', '🌷',
-    '🌙', '🌅', '🏆',
-    'campionessa di badminton 🏸',
-    '🌷', '🌟', 'sei la twin migliore', 'ti voglio bene 🤍'
+    'sei unica ⭐', '🌟', '⭐', '🌷', '🌙', '🌅', '🏆',
+    'campionessa di badminton 🏸', '🌷', '🌟',
+    'sei la twin migliore', 'ti voglio bene 🤍'
   ];
-
-  /* ✏️ Intervallo spawn in millisecondi */
-  const SPAWN_INTERVAL = 600;
-
   function spawnWord() {
-    const text = words[Math.floor(Math.random() * words.length)];
-    const el   = document.createElement('div');
+    const el = document.createElement('div');
     el.className   = 'compliment-word';
-    el.textContent = text;
-
-    // Dimensione tra 0.78rem e 1.3rem
+    el.textContent = words[Math.floor(Math.random() * words.length)];
     el.style.fontSize = (0.78 + Math.random() * 0.52) + 'rem';
-
-    // Posizione orizzontale fissa — non cambia durante l'animazione
-    el.style.left   = (3 + Math.random() * 90) + 'vw';
-    el.style.bottom = '-80px';
-
-    // Durata animazione
+    el.style.left     = (3 + Math.random() * 90) + 'vw';
+    el.style.bottom   = '-80px';
     const dur = 11 + Math.random() * 10;
     el.style.animationDuration = dur + 's';
-    // Nessun delay — parte subito, evita il flicker da restart
-    el.style.animationDelay = '0s';
-
+    el.style.animationDelay    = '0s';
     bg.appendChild(el);
-    // Rimuove l'elemento al termine dell'animazione
     setTimeout(() => el.remove(), dur * 1000 + 500);
   }
-
-  // Prime parole scaglionate
   for (let i = 0; i < 8; i++) setTimeout(spawnWord, i * 250);
-  setInterval(spawnWord, SPAWN_INTERVAL);
+  setInterval(spawnWord, 600);
 }
 
 /* ══════════════════════════════════════════════
-   POLLICI IN GIU — appaiono quando si clicca No alla schermata 1
+   POLLICI IN GIU
+   Layer separato, visibile solo su screen-1no
 ══════════════════════════════════════════════ */
 function burstThumbs() {
-  const container = document.getElementById('hearts-bg');
-  const count = 22;
-  for (let i = 0; i < count; i++) {
+  const container = document.getElementById('thumbs-bg');
+  container.innerHTML = '';
+  container.style.display = 'block';
+  for (let i = 0; i < 40; i++) {
     setTimeout(() => {
       const el = document.createElement('div');
       el.textContent = '👎';
       el.style.cssText = [
         'position:absolute',
-        'font-size:' + (18 + Math.random() * 22) + 'px',
+        'font-size:' + (20 + Math.random() * 26) + 'px',
         'left:' + (Math.random() * 95) + 'vw',
         'bottom:-50px',
         'opacity:0',
@@ -957,8 +909,13 @@ function burstThumbs() {
       ].join(';');
       container.appendChild(el);
       setTimeout(() => el.remove(), 10000);
-    }, i * 80);
+    }, i * 55);
   }
+}
+function stopThumbs() {
+  const container = document.getElementById('thumbs-bg');
+  container.innerHTML = '';
+  container.style.display = 'none';
 }
 
 /* ══════════════════════════════════════════════
@@ -975,8 +932,7 @@ function launchConfetti() {
     w: 8 + Math.random() * 9, h: 4 + Math.random() * 5,
     color: colors[Math.floor(Math.random() * colors.length)],
     vx: (Math.random() - 0.5) * 5, vy: 3 + Math.random() * 4,
-    rot: Math.random() * 360, vr: (Math.random() - 0.5) * 9,
-    opacity: 1
+    rot: Math.random() * 360, vr: (Math.random() - 0.5) * 9, opacity: 1
   }));
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
