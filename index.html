@@ -562,19 +562,29 @@ async function sendReservation(posto, data, ora) {
     `📅 Data: *${data}*\n` +
     `⏰ Orario: *${ora}*`;
 
-  try {
-    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+ try {
+  const res = await fetch(
+    `https://api.telegram.org/bot${TOKEN}/sendMessage`,
+    {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'Markdown' })
-    });
-    console.log('[Telegram] messaggio inviato');
-  } catch(e) {
-    console.warn('[Telegram] errore invio:', e);
-  }
-  return true;
-}
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text,
+        parse_mode: 'Markdown'
+      })
+    }
+  );
 
+  const data = await res.json();
+
+  console.log("STATUS:", res.status);
+  console.log("RISPOSTA:", data);
+
+} catch (e) {
+  console.error(e);
+}
+}
 /* ══════════════════════════════════════════════
    GIF CONFIG — incolla qui i tuoi URL da tenor.com
 ══════════════════════════════════════════════ */
